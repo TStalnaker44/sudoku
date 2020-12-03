@@ -4,7 +4,7 @@ class Board():
 
     def __init__(self, dimensions=(9,9)):
 
-        self._height = dimensions[0]
+        self._height = dimensions[1]
         self._width  = dimensions[0]
         
         self._board = [[0 for x in range(self._width)]
@@ -89,10 +89,15 @@ class Move():
         self._entry = entry
         self._coords = coords
 
+    def __str__(self):
+        return f"Move: {self._entry} @ {self._coords}"
+
     def __repr__(self):
-        return f"{self._entry} : {self._coords}"
+        return f"Move({self._entry}, {self._coords})"
 
 
 
-b = Board((16,16))
+b = Board((2,2))
 b.printBoard()
+print(Move(4, (0,0)))
+print(repr(Move(4, (0,0))))
