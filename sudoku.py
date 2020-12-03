@@ -1,6 +1,4 @@
-import pprint
-import math
-import random
+import pprint, math, random
 
 class Board():
 
@@ -48,33 +46,6 @@ class Board():
             random.shuffle(availNums)
             for num in availNums:
                 moveStack.append(Move(num, (row, column)))
-
-            
-        
-        
-
-
-        
-##        for row in range(self._height):
-##            potential = [x for x in range(1,self._width)]
-##            random.shuffle(potential)
-##            validRow = all([self.validPlacement(e, (row, column))
-##                         for column, e in enumerate(potential)])
-##            while not validRow:
-##                random.shuffle(potential)
-##                validRow = all([self.validPlacement(e, (row, column))
-##                         for column, e in enumerate(potential)])
-##            self._board[row] = potential
-##
-##            print(self._board)
-
-##        potential = [x for x in range(1,10)]
-##            for column in range(self._width):
-##                e = 0
-##                while not self.validPlacement(e, (row, column)):
-##                    e = random.choice(potential)
-##                self._board[row][column] = e
-##                potential.remove(e)
         
     def validPlacement(self, e, coords):
         inRow = e in self.getRow(coords[0])
