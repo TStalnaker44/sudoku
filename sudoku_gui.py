@@ -1,6 +1,7 @@
 
 import pygame
 from sudoku import Board
+from _thread import start_new_thread
 
 class SudokuGUI():
 
@@ -15,12 +16,12 @@ class SudokuGUI():
         self._board.printBoard()
 
     def solveBoard(self):
-        self._board.solve(self.animate)
+        start_new_thread(self._board.solve, (self.animate,))
         self.makeBoard()
 
     def animate(self):
         self.makeBoard()
-        self.draw()
+        #self.draw()
         
     def makeBoard(self):
         tiles = []
