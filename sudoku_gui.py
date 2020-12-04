@@ -1,3 +1,7 @@
+"""
+Author: Trevor Stalnaker
+File: sudoku_gui.py
+"""
 
 import pygame
 from sudoku import Board

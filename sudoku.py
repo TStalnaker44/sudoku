@@ -1,3 +1,8 @@
+"""
+Author: Trevor Stalnaker
+File: sudoku.py
+"""
+
 import pprint, math, random
 
 class Board():
