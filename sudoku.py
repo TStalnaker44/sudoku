@@ -13,39 +13,9 @@ class Board():
         self.createBoard()
 
     def createBoard(self):
-        # Initialize the move stack
-        moveStack = []
         
-        # Create a seed move
-        moveStack.append(Move(random.randint(1,self._width+1), (0,0)))
-        
-        while self._board[self._height-1][self._width-1] == 0:
-
-            # Pop a move off the stack
-            move = moveStack.pop() 
-
-            # Pop the stack until you find a valid move
-            while not self.validPlacement(move._entry, move._coords):
-                move = moveStack.pop()
-                #Reset entry currently at that position to 0
-                self._board[move._coords[0]][move._coords[1]] = 0
-                
-            # Add the new entry to the board        
-            self._board[move._coords[0]][move._coords[1]] = move._entry
-
-            # Determine the index / coordinates for the next move
-            index = (move._coords[0] * self._width) + move._coords[1]
-            index += 1 #increment the index
-            row = index // self._width
-            column = index % self._width
-
-            # Determine the available numbers to fill space
-            availNums = [x for x in range(1,self._width+1)]
-
-            # Add all potential moves to the stack
-            random.shuffle(availNums)
-            for num in availNums:
-                moveStack.append(Move(num, (row, column)))
+        # Create board by solving an empty board
+        self.solve()
 
         # Create empty spaces
         tileNum  = self._width*self._height
@@ -56,7 +26,7 @@ class Board():
             column = space % self._width
             self._board[row][column] = 0
 
-    def solve(self):
+    def solve(self, displayFunction=None):
         # Initialize the move stack
         moveStack = []
 
@@ -66,9 +36,6 @@ class Board():
                 if self._board[row][column] == 0:
                     index = (self._width * row) + column
                     initialEmptySpaces.append(index)
-
-##        print(initialEmptySpaces)
-##        print(len(initialEmptySpaces))
         
         # Find the initial empty space
         index = initialEmptySpaces[0]
@@ -79,59 +46,38 @@ class Board():
         # Push initial moves to the stack
         for x in range(1, self._width+1):
             moveStack.append(Move(x, (row,column)))
-
-        #print(moveStack)
         
         while not self.isSolved():
 
-            # Pop a move off the stack
-            try:
-                move = moveStack.pop()
-            except:
-                print("Broken")
-                self.printBoard()
-                break
+            move = moveStack.pop()
+            if displayFunction != None: displayFunction()
 
-##            print("-"*25)
             # Pop the stack until you find a valid move
             while not self.validPlacement(move._entry, move._coords):
-                try:
-                    move = moveStack.pop()
-                except:
-                    print("Broken")
-                    return 0
-                #Reset entry currently at that position to 0
-                self._board[move._coords[0]][move._coords[1]] = 0
+
+                move = moveStack.pop()
+
+                #Reset the board state, removing previous bad moves
                 newIndex = (move._coords[0] * self._width) + move._coords[1]
-                if prevIndex > newIndex:
-                    start = initialEmptySpaces.index(newIndex)
-                    end = initialEmptySpaces.index(prevIndex) + 1
-                    for i in initialEmptySpaces[start:end]:
-                        r = i // self._width
-                        c = i % self._width
-                        self._board[r][c] = 0
-##                self.printBoard()
-##            print("-"*25)
-                
+                startPos = initialEmptySpaces.index(newIndex)
+                for i in initialEmptySpaces[startPos:]:
+                    r = i // self._width
+                    c = i % self._width
+                    self._board[r][c] = 0
+
+                if displayFunction != None: displayFunction()
+
             # Add the new entry to the board        
             self._board[move._coords[0]][move._coords[1]] = move._entry
 
-            # Save the index of the previous move
-            prevIndex = index
-
             # Determine the index / coordinates for the next move
             index = (move._coords[0] * self._width) + move._coords[1]
-            row, column = 0, 0 #Initialize variables outside of loop
-            while True:
-                row = index // self._width
-                column = index % self._width
-                if index >= self._width*self._height or \
-                   self._board[row][column] == 0:
-                    break
-                index += 1
-
-##            print(row, column)
-                
+            nextSpace = min(initialEmptySpaces.index(index) + 1,
+                            len(initialEmptySpaces)-1)
+            index = initialEmptySpaces[nextSpace]
+            row = index // self._width
+            column = index % self._width
+                     
             # Determine the available numbers to fill space
             availNums = [x for x in range(1,self._width+1)]
 
@@ -140,10 +86,6 @@ class Board():
             for num in availNums:
                 moveStack.append(Move(num, (row, column)))
 
-##            self.printBoard()
-           # print(moveStack)
-            
- 
     def validPlacement(self, e, coords):
         inRow = e in self.getRow(coords[0])
         inColumn = e in self.getColumn(coords[1])
@@ -196,17 +138,8 @@ class Move():
         return f"Move({self._entry}, {self._coords})"
 
 
-
-##b = Board((9,9))
-##b.printBoard()
-##print(Move(4, (0,0)))
-##print(repr(Move(4, (0,0))))
-##b.solve()
-##b.printBoard()
 print("Running...")
-for x in range(100):
+for x in range(1):
     b = Board((9,9))
-    code = b.solve()
-    if code == 0:
-        print("Oof")
+    b.solve(b.printBoard)
 print("Done")
