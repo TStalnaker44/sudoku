@@ -46,6 +46,69 @@ class Board():
             random.shuffle(availNums)
             for num in availNums:
                 moveStack.append(Move(num, (row, column)))
+
+        # Create empty spaces
+        tileNum  = self._width*self._height
+        emptyNum = int(tileNum * 0.63)
+        spaces = random.sample(range(1, tileNum), emptyNum)
+        for space in spaces:
+            row = space // self._width
+            column = space % self._width
+            self._board[row][column] = 0
+
+    def solve(self):
+        # Initialize the move stack
+        moveStack = []
+
+        # Find the initial empty space
+        index = 0
+        row, column = 0,0
+        while True:
+            row = index // self._width
+            column = index % self._width
+            if self._board[row][column] == 0:
+                break
+            index += 1
+        
+        # Push initial moves to the stack
+        for x in range(1, self._width+1):
+            moveStack.append(Move(x, (row,column)))
+        
+        while not self.isSolved():
+
+            # Pop a move off the stack
+            move = moveStack.pop() 
+
+            # Pop the stack until you find a valid move
+            while not self.validPlacement(move._entry, move._coords):
+                move = moveStack.pop()
+                #Reset entry currently at that position to 0
+                self._board[move._coords[0]][move._coords[1]] = 0
+                
+            # Add the new entry to the board        
+            self._board[move._coords[0]][move._coords[1]] = move._entry
+
+            # Determine the index / coordinates for the next move
+            index = (move._coords[0] * self._width) + move._coords[1]
+            row, column = 0, 0 #Initialize variables outside of loop
+            while True:
+                row = index // self._width
+                column = index % self._width
+                if index >= self._width*self._height or \
+                   self._board[row][column] == 0:
+                    break
+                index += 1
+                
+            # Determine the available numbers to fill space
+            availNums = [x for x in range(1,self._width+1)]
+
+            # Add all potential moves to the stack
+            random.shuffle(availNums)
+            for num in availNums:
+                moveStack.append(Move(num, (row, column)))
+
+            self.printBoard()
+            
         
     def validPlacement(self, e, coords):
         inRow = e in self.getRow(coords[0])
@@ -68,7 +131,7 @@ class Board():
 
     def getNumbersInQuadrant(self, r, c):
         q = self.getQuadrant(r, c)
-        return [e for row in q for e in row ]
+        return [e for row in q for e in row]
             
     def getQuadrant(self, r, c):
         q_r = r * int(math.sqrt(self._height))
@@ -82,6 +145,9 @@ class Board():
         r = row // int(math.sqrt(self._height))
         c = column // int(math.sqrt(self._width))
         return (r, c)
+
+    def isSolved(self):
+        return not 0 in [e for row in self._board for e in row]
 
 class Move():
 
@@ -97,7 +163,9 @@ class Move():
 
 
 
-b = Board((2,2))
+b = Board((9,9))
 b.printBoard()
 print(Move(4, (0,0)))
 print(repr(Move(4, (0,0))))
+b.solve()
+b.printBoard()
