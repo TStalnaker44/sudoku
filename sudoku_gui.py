@@ -14,10 +14,22 @@ class SudokuGUI():
         self._board = Board((9,9))
         self.makeBoard()
         self._board.printBoard()
+        self._solved = False
+        self._solving = False
 
     def solveBoard(self):
-        start_new_thread(self._board.solve, (self.animate,))
+        self._solving = True
+        start_new_thread(self._solve, ())
+
+    def quickSolve(self):
+        self._solved = True
+        self._board.solve()
         self.makeBoard()
+
+    def _solve(self):
+        self._board.solve(self.animate)
+        self.makeBoard()
+        self._solved = True
 
     def animate(self):
         self.makeBoard()
@@ -43,8 +55,12 @@ class SudokuGUI():
         for event in pygame.event.get():
             if (event.type == pygame.QUIT):
                 self._RUNNING = False
-            if event.type == pygame.KEYDOWN and event.key==pygame.K_SPACE:
-                self.solveBoard()
+            if not self._solved:
+                if not self._solving:
+                    if event.type == pygame.KEYDOWN and event.key==pygame.K_SPACE:
+                        self.solveBoard()
+                    if event.type == pygame.KEYDOWN and event.key==pygame.K_RETURN:
+                        self.quickSolve()
 
     def runGameLoop(self):
         while self.isRunning():
