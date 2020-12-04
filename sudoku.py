@@ -12,14 +12,14 @@ class Board():
         
         self.createBoard()
 
-    def createBoard(self):
+    def createBoard(self, emptyTiles=None):
         
         # Create board by solving an empty board
         self.solve()
 
         # Create empty spaces
         tileNum  = self._width*self._height
-        emptyNum = int(tileNum * 0.63)
+        emptyNum = int(tileNum * 0.63) if emptyTiles == None else emptyTiles
         spaces = random.sample(range(1, tileNum), emptyNum)
         for space in spaces:
             row = space // self._width
@@ -141,5 +141,5 @@ class Move():
 print("Running...")
 for x in range(1):
     b = Board((9,9))
-    b.solve(b.printBoard)
+    b.solve()
 print("Done")
