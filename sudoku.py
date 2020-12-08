@@ -85,38 +85,3 @@ class Board():
 
     def isSolved(self):
         return not 0 in [e for row in self._board for e in row]
-
-##class Move():
-##
-##    def __init__(self, entry, coords):
-##        self._entry = entry
-##        self._coords = coords
-##
-##    def __str__(self):
-##        return f"Move: {self._entry} @ {self._coords}"
-##
-##    def __repr__(self):
-##        return f"Move({self._entry}, {self._coords})"
-
-##
-##print("Running...")
-##for x in range(1):
-##    b = Board((16,16))
-##    b2 = copy.deepcopy(b)
-##
-##    # Solve with original solution
-####    b.printBoard()
-####    t1 = time.time()
-####    b.solve()
-####    print(time.time()-t1)
-####    b.printBoard()
-##
-##    print("*"*32)
-##
-##    # Solve with recursion
-##    b2.printBoard()
-##    t1 = time.time()
-##    b2.altSolve()
-##    print(time.time()-t1)
-##    b2.printBoard()
-##print("Done")
