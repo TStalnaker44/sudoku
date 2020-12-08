@@ -3,19 +3,21 @@ Author: Trevor Stalnaker
 File: sudoku_gui.py
 """
 
-import pygame
+import pygame, math
 from sudoku import Board
 from _thread import start_new_thread
 
 class SudokuGUI():
 
-    def __init__(self):
+    def __init__(self, n=9):
+        assert math.sqrt(n).is_integer()
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption('Sudoku GUI')
-        self._screen = pygame.display.set_mode((286,286))
+        dim = 26 * (n+2) #pixelsPerSquare * (numSquares + padding)
+        self._screen = pygame.display.set_mode((dim,dim))
         self._RUNNING = True
-        self._board = Board((9,9))
+        self._board = Board(n)
         self.makeBoard()
         self._board.printBoard()
         self._solved = False
@@ -31,13 +33,12 @@ class SudokuGUI():
         self.makeBoard()
 
     def _solve(self):
-        self._board.solve(self.animate)
+        self._board.altSolve(self.animate)
         self.makeBoard()
         self._solved = True
 
     def animate(self):
         self.makeBoard()
-        #self.draw()
         
     def makeBoard(self):
         tiles = []
@@ -98,5 +99,5 @@ class SudokuTile():
         screen.blit(self._image, self._pos)
 
 
-g =SudokuGUI()
+g =SudokuGUI(9)
 g.runGameLoop()

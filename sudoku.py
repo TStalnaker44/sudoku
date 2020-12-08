@@ -3,94 +3,50 @@ Author: Trevor Stalnaker
 File: sudoku.py
 """
 
-import pprint, math, random
+import pprint, math, random, time, copy
 
 class Board():
 
-    def __init__(self, dimensions=(9,9)):
+    def __init__(self, n=9):
 
-        self._height = dimensions[1]
-        self._width  = dimensions[0]
-        
-        self._board = [[0 for x in range(self._width)]
-                       for x in range(self._height)]
+        assert math.sqrt(n).is_integer()
+
+        self._n = n
+
+        self._board = [[0 for x in range(self._n)]
+                       for x in range(self._n)]
         
         self.createBoard()
 
     def createBoard(self, emptyTiles=None):
         
         # Create board by solving an empty board
-        self.solve()
+        self.altSolve()
 
         # Create empty spaces
-        tileNum  = self._width*self._height
+        tileNum  = self._n**2
         emptyNum = int(tileNum * 0.63) if emptyTiles == None else emptyTiles
         spaces = random.sample(range(1, tileNum), emptyNum)
         for space in spaces:
-            row = space // self._width
-            column = space % self._width
+            row = space // self._n
+            column = space % self._n
             self._board[row][column] = 0
 
-    def solve(self, displayFunction=None):
-        # Initialize the move stack
-        moveStack = []
-
-        initialEmptySpaces = []
-        for row in range(self._height):
-            for column in range(self._width):
+    def altSolve(self, displayFunction=None):
+        for row in range(self._n):
+            for column in range(self._n):
                 if self._board[row][column] == 0:
-                    index = (self._width * row) + column
-                    initialEmptySpaces.append(index)
-        
-        # Find the initial empty space
-        index = initialEmptySpaces[0]
-        prevIndex = index
-        row = index // self._width
-        column = index % self._width
-            
-        # Push initial moves to the stack
-        for x in range(1, self._width+1):
-            moveStack.append(Move(x, (row,column)))
-        
-        while not self.isSolved():
-
-            move = moveStack.pop()
-            if displayFunction != None: displayFunction()
-
-            # Pop the stack until you find a valid move
-            while not self.validPlacement(move._entry, move._coords):
-
-                move = moveStack.pop()
-
-                #Reset the board state, removing previous bad moves
-                newIndex = (move._coords[0] * self._width) + move._coords[1]
-                startPos = initialEmptySpaces.index(newIndex)
-                for i in initialEmptySpaces[startPos:]:
-                    r = i // self._width
-                    c = i % self._width
-                    self._board[r][c] = 0
-
-                if displayFunction != None: displayFunction()
-
-            # Add the new entry to the board        
-            self._board[move._coords[0]][move._coords[1]] = move._entry
-
-            # Determine the index / coordinates for the next move
-            index = (move._coords[0] * self._width) + move._coords[1]
-            nextSpace = min(initialEmptySpaces.index(index) + 1,
-                            len(initialEmptySpaces)-1)
-            index = initialEmptySpaces[nextSpace]
-            row = index // self._width
-            column = index % self._width
-                     
-            # Determine the available numbers to fill space
-            availNums = [x for x in range(1,self._width+1)]
-
-            # Add all potential moves to the stack
-            random.shuffle(availNums)
-            for num in availNums:
-                moveStack.append(Move(num, (row, column)))
-
+                    temp = [i for i in range(1, self._n+1)]
+                    random.shuffle(temp)
+                    for e in temp:
+                        if self.validPlacement(e, (row, column)):
+                            self._board[row][column] = e
+                            if displayFunction != None: displayFunction()
+                            self.altSolve(displayFunction)
+                            if not self.isSolved():
+                                self._board[row][column] = 0
+                    return 0
+                    
     def validPlacement(self, e, coords):
         inRow = e in self.getRow(coords[0])
         inColumn = e in self.getColumn(coords[1])
@@ -115,36 +71,52 @@ class Board():
         return [e for row in q for e in row]
             
     def getQuadrant(self, r, c):
-        q_r = r * int(math.sqrt(self._height))
-        q_c = c * int(math.sqrt(self._width))
-        quadWidth = int(math.sqrt(self._width))
-        quadHeight = int(math.sqrt(self._height))
-        return [row[q_c:q_c+quadWidth] for row in
-                self._board[q_r:q_r+quadHeight]]
+        q_n = int(math.sqrt(self._n))
+        q_r = r * q_n
+        q_c = c * q_n
+        return [row[q_c:q_c+q_n] for row in
+                self._board[q_r:q_r+q_n]]
 
     def findQuadrantByEntry(self, row, column):
-        r = row // int(math.sqrt(self._height))
-        c = column // int(math.sqrt(self._width))
+        q_n = int(math.sqrt(self._n))
+        r = row // q_n
+        c = column // q_n
         return (r, c)
 
     def isSolved(self):
         return not 0 in [e for row in self._board for e in row]
 
-class Move():
+##class Move():
+##
+##    def __init__(self, entry, coords):
+##        self._entry = entry
+##        self._coords = coords
+##
+##    def __str__(self):
+##        return f"Move: {self._entry} @ {self._coords}"
+##
+##    def __repr__(self):
+##        return f"Move({self._entry}, {self._coords})"
 
-    def __init__(self, entry, coords):
-        self._entry = entry
-        self._coords = coords
-
-    def __str__(self):
-        return f"Move: {self._entry} @ {self._coords}"
-
-    def __repr__(self):
-        return f"Move({self._entry}, {self._coords})"
-
-
-print("Running...")
-for x in range(1):
-    b = Board((9,9))
-    b.solve()
-print("Done")
+##
+##print("Running...")
+##for x in range(1):
+##    b = Board((16,16))
+##    b2 = copy.deepcopy(b)
+##
+##    # Solve with original solution
+####    b.printBoard()
+####    t1 = time.time()
+####    b.solve()
+####    print(time.time()-t1)
+####    b.printBoard()
+##
+##    print("*"*32)
+##
+##    # Solve with recursion
+##    b2.printBoard()
+##    t1 = time.time()
+##    b2.altSolve()
+##    print(time.time()-t1)
+##    b2.printBoard()
+##print("Done")
