@@ -45,7 +45,7 @@ class Board():
                             self.altSolve(displayFunction)
                             if not self.isSolved():
                                 self._board[row][column] = 0
-                    return 0
+                    return
                     
     def validPlacement(self, e, coords):
         inRow = e in self.getRow(coords[0])
