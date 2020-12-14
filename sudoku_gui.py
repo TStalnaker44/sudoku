@@ -33,7 +33,7 @@ class SudokuGUI():
         self.makeBoard()
 
     def _solve(self):
-        self._board.altSolve(self.animate)
+        self._board.solve(self.animate)
         self.makeBoard()
         self._solved = True
 

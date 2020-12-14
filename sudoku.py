@@ -21,7 +21,7 @@ class Board():
     def createBoard(self, emptyTiles=None):
         
         # Create board by solving an empty board
-        self.altSolve()
+        self.solve()
 
         # Create empty spaces
         tileNum  = self._n**2
@@ -32,20 +32,29 @@ class Board():
             column = space % self._n
             self._board[row][column] = 0
 
-    def altSolve(self, displayFunction=None):
+    def solve(self, displayFunction=None):
         for row in range(self._n):
             for column in range(self._n):
                 if self._board[row][column] == 0:
                     temp = [i for i in range(1, self._n+1)]
-                    random.shuffle(temp)
+                    ##random.shuffle(temp)
                     for e in temp:
                         if self.validPlacement(e, (row, column)):
                             self._board[row][column] = e
                             if displayFunction != None: displayFunction()
-                            self.altSolve(displayFunction)
+                            self.solve(displayFunction)
                             if not self.isSolved():
                                 self._board[row][column] = 0
                     return
+
+    def findEmptySpaces(self):
+        spaces = []
+        for row in range(self._n):
+            for column in range(self._n):
+                if self._board[row][column] == 0:
+                    spaces.append((row, column))
+        return spaces
+        
                     
     def validPlacement(self, e, coords):
         inRow = e in self.getRow(coords[0])
@@ -85,3 +94,22 @@ class Board():
 
     def isSolved(self):
         return not 0 in [e for row in self._board for e in row]
+
+
+##b1 = Board()
+##b2 = copy.deepcopy(b1)
+##
+##b1.printBoard()
+##t = time.time()
+##b1.solveStarter()
+##b1.printBoard()
+##print(time.time()-t)
+##
+##print("*"*45)
+##
+##b2.printBoard()
+##t = time.time()
+##b2.altSolve()
+##b2.printBoard()
+##print(time.time()-t)
+
