@@ -37,7 +37,7 @@ class Board():
             for column in range(self._n):
                 if self._board[row][column] == 0:
                     temp = [i for i in range(1, self._n+1)]
-                    ##random.shuffle(temp)
+                    random.shuffle(temp)
                     for e in temp:
                         if self.validPlacement(e, (row, column)):
                             self._board[row][column] = e
