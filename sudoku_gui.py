@@ -34,7 +34,6 @@ class SudokuGUI():
 
     def _solve(self):
         self._board.solve(self.animate)
-        self.makeBoard()
         self._solved = True
 
     def animate(self):
